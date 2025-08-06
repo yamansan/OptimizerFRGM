@@ -1,0 +1,20 @@
+2025-07-02 17:11:10,277 - __main__ - INFO - LivePriceMonitor initialized
+2025-07-02 17:11:10,278 - __main__ - INFO - Running single price update
+2025-07-02 17:11:11,075 - __main__ - INFO - Updated prices for 0 instruments
+2025-07-02 17:11:20,919 - __main__ - INFO - LivePriceMonitor initialized
+2025-07-02 17:11:20,920 - __main__ - INFO - Starting live price monitoring (interval: 3s)
+2025-07-02 17:11:20,920 - __main__ - INFO - Will run for 15 seconds
+2025-07-02 17:11:20,920 - __main__ - INFO - Price update #1
+2025-07-02 17:11:21,707 - __main__ - INFO - Updated prices for 0 instruments
+2025-07-02 17:11:24,713 - __main__ - INFO - Price update #2
+2025-07-02 17:11:25,316 - __main__ - INFO - Updated prices for 0 instruments
+2025-07-02 17:11:28,317 - __main__ - INFO - Price update #3
+2025-07-02 17:11:28,914 - __main__ - INFO - Updated prices for 0 instruments
+2025-07-02 17:11:31,915 - __main__ - INFO - Price update #4
+2025-07-02 17:11:32,512 - __main__ - INFO - Updated prices for 0 instruments
+2025-07-02 17:11:35,513 - __main__ - INFO - Price update #5
+2025-07-02 17:11:36,132 - __main__ - INFO - Updated prices for 0 instruments
+2025-07-02 17:11:39,133 - __main__ - INFO - Monitoring stopped after 5 updates
+2025-07-02 17:20:59,809 - __main__ - INFO - LivePriceMonitor initialized
+2025-07-02 17:20:59,809 - __main__ - INFO - Running single price update
+2025-07-02 17:21:01,394 - __main__ - INFO - Updated prices for 1 instruments

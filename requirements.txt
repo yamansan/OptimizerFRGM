@@ -1,0 +1,12 @@
+# Core dependencies
+dash>=2.17.0
+dash-bootstrap-components>=1.6.0
+pandas>=2.2.0
+requests>=2.31.0
+
+# UI automation dependencies (for Pricing Monkey integration)
+pyperclip>=1.8.2
+pywinauto>=0.6.8 
+
+# File system monitoring
+watchdog>=3.0.0 

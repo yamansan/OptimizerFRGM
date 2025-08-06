@@ -1,0 +1,217 @@
+# Tribal Knowledge Journal - Scenario Ladder Trading System
+
+## System Philosophy
+This is a real-time trading system where accuracy and reliability are paramount. Every price conversion must be exact, every P&L calculation must be correct, and every API call must be properly authenticated and handled. The system prioritizes data integrity over performance, and graceful degradation over feature completeness.
+
+## Critical Patterns & Conventions
+
+### Price Handling
+- **NEVER** use floating point arithmetic for price calculations without proper rounding
+- **ALWAYS** convert TT bond prices through the decimal_to_tt_bond_format() function
+- **REMEMBER** that TT bond format uses 'XXX'YYZ where YYZ represents 64ths (not 32nds)
+- **VALIDATE** all price inputs before processing to prevent calculation errors
+
+### TT API Integration
+- **ALWAYS** use TTTokenManager for authentication - never implement token handling manually
+- **NEVER** hardcode API endpoints - use the base URL constants
+- **ALWAYS** include proper request IDs in the format: AppName-CompanyName--UUID
+- **REMEMBER** to check token expiry before making API calls
+- **HANDLE** rate limiting gracefully with exponential backoff
+
+### Error Handling Philosophy
+- **FAIL GRACEFULLY**: Show cached data with error indicators rather than crash
+- **LOG EVERYTHING**: All errors, API calls, and state changes should be logged
+- **VALIDATE INPUTS**: Check all inputs at API boundaries and UI entry points
+- **PROVIDE CONTEXT**: Error messages should help users understand what went wrong and how to fix it
+
+### Data Flow Patterns
+- **SINGLE SOURCE OF TRUTH**: TT API is the authoritative source for all trading data
+- **CACHE INTELLIGENTLY**: Cache market enums and user data, but not position data
+- **PERSIST STATE**: Background processes must persist state for recovery
+- **VALIDATE CONSISTENCY**: Cross-check data between different sources when possible
+
+## Environment Management
+- **DEVELOPMENT**: Always use SIM environment for development and testing
+- **TESTING**: Use UAT environment for pre-production validation
+- **PRODUCTION**: LIVE environment requires explicit approval and careful monitoring
+- **ISOLATION**: Keep credentials and data completely separate between environments
+
+## Windows-Specific Considerations
+- **PATHS**: Use os.path.join() for all file paths to maintain Windows compatibility
+- **AUTOMATION**: Pricing Monkey integration requires Windows and specific timing
+- **BATCH FILES**: PowerShell scripts handle system management and monitoring
+- **PERMISSIONS**: Ensure proper file permissions for token and state files
+
+## Performance Patterns
+- **LAZY LOADING**: Only fetch data when needed by user actions
+- **BATCH OPERATIONS**: Group related API calls to reduce network overhead
+- **CACHE AGGRESSIVELY**: Cache any data that doesn't change frequently
+- **ASYNC PROCESSING**: Use background processes for long-running operations
+
+## Code Organization Rules
+- **COMPONENTS**: All UI components must inherit from BaseComponent
+- **MODULES**: Keep trading logic separate from UI components
+- **CONFIGURATION**: All configuration in config.py, no hardcoded values
+- **UTILITIES**: Reusable functions go in appropriate lib/ subdirectories
+
+## Testing Strategies
+- **MOCK DATA**: Use USE_MOCK_DATA flag for offline development
+- **REAL API**: Test against SIM environment for integration testing
+- **PRICE VALIDATION**: Always test price conversions with known good values
+- **ERROR SCENARIOS**: Test all error conditions and recovery paths
+
+## Debugging Techniques
+- **CONSOLE LOGGING**: All modules provide detailed console output
+- **API INSPECTION**: Log full API responses when debugging
+- **STATE ANALYSIS**: Examine pickle files for background process state
+- **NETWORK DEBUGGING**: Use browser DevTools for web interface issues
+
+## Security Practices
+- **CREDENTIAL STORAGE**: Never commit API keys to version control
+- **TOKEN PROTECTION**: Token files should have restricted permissions
+- **ENVIRONMENT SEPARATION**: Use different credentials for each environment
+- **LOGGING SECURITY**: Never log sensitive authentication data
+
+## Common Pitfalls & Solutions
+
+### Price Format Confusion
+- **PROBLEM**: Mixing decimal and TT bond formats
+- **SOLUTION**: Always use conversion functions, never manual conversion
+- **EXAMPLE**: Use decimal_to_tt_bond_format(110.015625) → "110'005"
+
+### Token Expiry Issues
+- **PROBLEM**: API calls fail with 401 errors
+- **SOLUTION**: Let TTTokenManager handle refresh automatically
+- **DEBUGGING**: Check token file timestamps and expiry dates
+
+### Environment Mismatches
+- **PROBLEM**: Using wrong credentials for environment
+- **SOLUTION**: Verify ENVIRONMENT setting matches credentials
+- **VALIDATION**: Check API endpoint URLs match environment
+
+### Data Synchronization
+- **PROBLEM**: Background processes and UI showing different data
+- **SOLUTION**: Ensure single source of truth and proper refresh logic
+- **MONITORING**: Check timestamps on data files and database
+
+### Browser Automation Timing
+- **PROBLEM**: Pricing Monkey integration fails intermittently
+- **SOLUTION**: Adjust timing constants for slower systems
+- **FALLBACK**: Implement retry logic and manual price entry
+
+## Development Workflow
+
+### Starting Development
+1. Verify environment is set to SIM
+2. Enable USE_MOCK_DATA for offline work
+3. Check token file exists and is valid
+4. Run system status checks
+
+### Making Changes
+1. Update Memory Bank documentation first
+2. Implement changes in small, testable chunks
+3. Test against SIM environment
+4. Update code-index.md and io-schema.md
+5. Validate all price conversions
+
+### Deployment Process
+1. Complete testing in SIM environment
+2. Deploy to UAT for validation
+3. Get approval for LIVE deployment
+4. Monitor system closely after deployment
+
+## Monitoring & Maintenance
+
+### Daily Checks
+- Verify background processes are running
+- Check log files for errors
+- Validate data file timestamps
+- Monitor API response times
+
+### Weekly Reviews
+- Review error logs and patterns
+- Check system performance metrics
+- Validate data accuracy
+- Update documentation as needed
+
+### Monthly Maintenance
+- Review and rotate credentials
+- Update dependencies and security patches
+- Analyze performance trends
+- Plan feature enhancements
+
+## Emergency Procedures
+
+### System Down
+1. Check process status with batch scripts
+2. Restart background monitors
+3. Verify API connectivity
+4. Check log files for root cause
+
+### Data Issues
+1. Stop background processes
+2. Backup current state files
+3. Restore from last known good state
+4. Resume monitoring with clean state
+
+### API Problems
+1. Check TT API status
+2. Verify token validity
+3. Switch to mock data if needed
+4. Implement temporary workarounds
+
+## Domain Knowledge
+
+### Bond Trading Concepts
+- **Basis Points**: 1 BP = 0.01% = $15.625 for ZN futures
+- **Tick Size**: ZN futures trade in 1/64th point increments
+- **Position Risk**: Calculate as position × tick value
+- **P&L Attribution**: LIFO accounting for realized gains/losses
+
+### TT API Specifics
+- **Token Lifecycle**: Tokens expire and must be refreshed
+- **Rate Limits**: API has undocumented rate limits
+- **Data Format**: Prices come as decimals, must convert to bond format
+- **Market IDs**: CME = 1, CBOT = 2, etc.
+
+### LIFO Processing
+- **Stack Management**: Maintain position stack with (quantity, price) tuples
+- **Realized P&L**: Calculate when offsetting positions
+- **State Persistence**: Save stack state for recovery
+- **Transaction Deduplication**: Prevent duplicate processing
+
+## Integration Points
+
+### External Systems
+- **TT API**: Primary data source for orders and fills
+- **Pricing Monkey**: Spot price feed via browser automation
+- **Actant SOD**: Start of day position data
+- **Windows OS**: Required for browser automation
+
+### Internal Components
+- **Web Interface**: Dash application for user interaction
+- **Background Monitors**: Continuous data collection
+- **Database Layer**: SQLite for persistent storage
+- **Component Library**: Reusable UI components
+
+## Future Considerations
+
+### Scalability
+- Consider streaming APIs for real-time updates
+- Implement proper database indexing for large datasets
+- Add caching layers for frequently accessed data
+- Consider microservices architecture for better scaling
+
+### Reliability
+- Implement proper health checks and monitoring
+- Add automated failover for critical components
+- Create comprehensive backup and recovery procedures
+- Add circuit breakers for external dependencies
+
+### Security
+- Implement proper authentication and authorization
+- Add encryption for sensitive data storage
+- Regular security audits and penetration testing
+- Implement proper audit logging for compliance
+
+This tribal knowledge represents the accumulated wisdom of building and maintaining a mission-critical trading system. Always prioritize correctness over performance, and remember that in trading, accuracy is everything. 

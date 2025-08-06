@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fetch Test</title>
+</head>
+<body>
+    <h1>Fetch Test</h1>
+    <div id="result">Testing fetch...</div>
+    
+    <script>
+        console.log('Starting fetch test...');
+        
+        fetch('http://localhost:8080/risk_table_data.html')
+            .then(response => {
+                console.log('Response status:', response.status);
+                console.log('Response ok:', response.ok);
+                return response.text();
+            })
+            .then(data => {
+                console.log('Data received:', data.substring(0, 100) + '...');
+                document.getElementById('result').innerHTML = 'SUCCESS: Data loaded!';
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+                document.getElementById('result').innerHTML = 'ERROR: ' + error.message;
+            });
+    </script>
+</body>
+</html> 
